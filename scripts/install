@@ -120,3 +120,5 @@ sudo yunohost app ssowatconf
 sudo service nginx reload
 sudo service matrix-synapse restart
 sudo service coturn restart
+
+sleep 120
