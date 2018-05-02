@@ -1,0 +1,166 @@
+From f692538d62165949b563b12ea6b7bdafbf3396ce Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Sun, 29 Apr 2018 15:27:30 +0100
+Subject: [PATCH 1/6] Replace _OpenSSLECCurve with crypto.get_elliptic_curve
+
+---
+ synapse/crypto/context_factory.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/synapse/crypto/context_factory.py b/synapse/crypto/context_factory.py
+index cff3ca809..cd9ee1ba4 100644
+--- a/synapse/crypto/context_factory.py
++++ b/synapse/crypto/context_factory.py
+@@ -13,8 +13,8 @@
+ # limitations under the License.
+ 
+ from twisted.internet import ssl
+-from OpenSSL import SSL
+-from twisted.internet._sslverify import _OpenSSLECCurve, _defaultCurveName
++from OpenSSL import SSL, crypto
++from twisted.internet._sslverify import _defaultCurveName
+ 
+ import logging
+ 
+@@ -32,8 +32,11 @@ def __init__(self, config):
+     @staticmethod
+     def configure_context(context, config):
+         try:
+-            _ecCurve = _OpenSSLECCurve(_defaultCurveName)
+-            _ecCurve.addECKeyToContext(context)
++            # This was removed in https://github.com/twisted/twisted/pull/928
++            # _ecCurve = _OpenSSLECCurve()
++            _evCurve = crypto.get_elliptic_curve(_defaultCurveName)
++            context.set_tmp_ecdh(_evCurve)
++
+         except Exception:
+             logger.exception("Failed to enable elliptic curve for TLS")
+         context.set_options(SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3)
+
+From 7ae89bbd67e093b18ecd11531084abf72f89ce19 Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Mon, 30 Apr 2018 00:33:24 +0100
+Subject: [PATCH 2/6] _evCurve > _ecCurve
+
+---
+ synapse/crypto/context_factory.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/synapse/crypto/context_factory.py b/synapse/crypto/context_factory.py
+index cd9ee1ba4..27fd39c9e 100644
+--- a/synapse/crypto/context_factory.py
++++ b/synapse/crypto/context_factory.py
+@@ -34,8 +34,8 @@ def configure_context(context, config):
+         try:
+             # This was removed in https://github.com/twisted/twisted/pull/928
+             # _ecCurve = _OpenSSLECCurve()
+-            _evCurve = crypto.get_elliptic_curve(_defaultCurveName)
+-            context.set_tmp_ecdh(_evCurve)
++            _ecCurve = crypto.get_elliptic_curve(_defaultCurveName)
++            context.set_tmp_ecdh(_ecCurve)
+ 
+         except Exception:
+             logger.exception("Failed to enable elliptic curve for TLS")
+
+From 24bfcaf5e3ef7d5d4b3b745c099d2a2b9084980d Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Mon, 30 Apr 2018 00:34:58 +0100
+Subject: [PATCH 3/6] Remove tombstone comment
+
+---
+ synapse/crypto/context_factory.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/synapse/crypto/context_factory.py b/synapse/crypto/context_factory.py
+index 27fd39c9e..0397f73ab 100644
+--- a/synapse/crypto/context_factory.py
++++ b/synapse/crypto/context_factory.py
+@@ -32,8 +32,6 @@ def __init__(self, config):
+     @staticmethod
+     def configure_context(context, config):
+         try:
+-            # This was removed in https://github.com/twisted/twisted/pull/928
+-            # _ecCurve = _OpenSSLECCurve()
+             _ecCurve = crypto.get_elliptic_curve(_defaultCurveName)
+             context.set_tmp_ecdh(_ecCurve)
+ 
+
+From 55bd158b3a13fa748e5d6e0246707702da3b12ef Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Mon, 30 Apr 2018 01:00:18 +0100
+Subject: [PATCH 4/6] Remove pin on Twisted 18.4
+
+---
+ synapse/python_dependencies.py | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/synapse/python_dependencies.py b/synapse/python_dependencies.py
+index 711cbb6c5..e056c5d3f 100644
+--- a/synapse/python_dependencies.py
++++ b/synapse/python_dependencies.py
+@@ -39,11 +39,7 @@
+     "signedjson>=1.0.0": ["signedjson>=1.0.0"],
+     "pynacl>=1.2.1": ["nacl>=1.2.1", "nacl.bindings"],
+     "service_identity>=1.0.0": ["service_identity>=1.0.0"],
+-
+-    # we break under Twisted 18.4
+-    # (https://github.com/matrix-org/synapse/issues/3135)
+-    "Twisted>=16.0.0,<18.4": ["twisted>=16.0.0"],
+-
++    "Twisted>=16.0.0": ["twisted>=16.0.0"],
+     "pyopenssl>=0.14": ["OpenSSL>=0.14"],
+     "pyyaml": ["yaml"],
+     "pyasn1": ["pyasn1"],
+
+From fff7c33044d734fe42821dba7e1a006e6548f611 Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Mon, 30 Apr 2018 11:24:05 +0100
+Subject: [PATCH 5/6] pyopenssl>=0.15
+
+---
+ synapse/python_dependencies.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/synapse/python_dependencies.py b/synapse/python_dependencies.py
+index e056c5d3f..756432285 100644
+--- a/synapse/python_dependencies.py
++++ b/synapse/python_dependencies.py
+@@ -40,7 +40,10 @@
+     "pynacl>=1.2.1": ["nacl>=1.2.1", "nacl.bindings"],
+     "service_identity>=1.0.0": ["service_identity>=1.0.0"],
+     "Twisted>=16.0.0": ["twisted>=16.0.0"],
+-    "pyopenssl>=0.14": ["OpenSSL>=0.14"],
++    
++    # We use crypto.get_elliptic_curve which is only supported in >=0.15
++    "pyopenssl>=0.15": ["OpenSSL>=0.15"],
++    
+     "pyyaml": ["yaml"],
+     "pyasn1": ["pyasn1"],
+     "daemonize": ["daemonize"],
+
+From 952d0ba32549543d6cb495c81819db24697b71bb Mon Sep 17 00:00:00 2001
+From: Will Hunt <will@half-shot.uk>
+Date: Mon, 30 Apr 2018 12:01:34 +0100
+Subject: [PATCH 6/6] Remove whitespace in python_dep
+
+---
+ synapse/python_dependencies.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/synapse/python_dependencies.py b/synapse/python_dependencies.py
+index 756432285..216db4d16 100644
+--- a/synapse/python_dependencies.py
++++ b/synapse/python_dependencies.py
+@@ -40,10 +40,10 @@
+     "pynacl>=1.2.1": ["nacl>=1.2.1", "nacl.bindings"],
+     "service_identity>=1.0.0": ["service_identity>=1.0.0"],
+     "Twisted>=16.0.0": ["twisted>=16.0.0"],
+-    
++
+     # We use crypto.get_elliptic_curve which is only supported in >=0.15
+     "pyopenssl>=0.15": ["OpenSSL>=0.15"],
+-    
++
+     "pyyaml": ["yaml"],
+     "pyasn1": ["pyasn1"],
+     "daemonize": ["daemonize"],

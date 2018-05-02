@@ -46,6 +46,12 @@ install_source() {
 		pip install --upgrade cffi ndg-httpsclient psycopg2 lxml
 		pip install --upgrade https://github.com/matrix-org/synapse/archive/v$APP_VERSION.tar.gz
 		deactivate
+		
+		# Backport patch https://github.com/matrix-org/synapse/pull/3157
+		old_pwd=$PWD
+		cd $final_path/lib/python2.7/site-packages
+		patch -i $old_pwd/../source/update-crypto-factory.patch
+		cd $old_pwd
 	fi
 
     # Set permission
