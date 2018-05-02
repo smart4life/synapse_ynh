@@ -49,8 +49,8 @@ install_source() {
 		
 		# Backport patch https://github.com/matrix-org/synapse/pull/3157
 		old_pwd=$PWD
-		cd $final_path/lib/python2.7/site-packages
-		patch -i $old_pwd/../source/update-crypto-factory.patch
+		cd $final_path/lib/python2.7/site-packages/synapse
+		patch -p2 -i $old_pwd/../sources/update-crypto-factory.patch || true
 		cd $old_pwd
 	fi
 

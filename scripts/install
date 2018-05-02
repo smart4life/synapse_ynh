@@ -94,6 +94,12 @@ ynh_use_logrotate /var/log/matrix-synapse/
 # register yunohost service
 yunohost service add matrix-synapse
 
+chown $synapse_user:root -R $final_path
+chown $synapse_user:root -R /var/lib/matrix-$app
+chown $synapse_user:root -R /var/log/matrix-$app
+chown $synapse_user:root -R /etc/matrix-$app
+chmod u=rwX,g=rX,o= -R /etc/matrix-$app
+
 # Recharge la configuration Nginx
 systemctl restart matrix-synapse.service
 systemctl restart coturn.service
