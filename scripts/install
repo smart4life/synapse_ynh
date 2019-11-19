@@ -174,8 +174,8 @@ python -m synapse.app.homeserver --keys-directory /etc/matrix-$app/ --generate-c
 deactivate
 
 # Get random values from config
-registration_shared_secret=$(egrep "registration_shared_secret" homeserver.yml | cut -d'"' -f2)
-form_secret=$(egrep "form_secret" homeserver.yml | cut -d'"' -f2)
+registration_shared_secret=$(egrep "registration_shared_secret:" homeserver.yml | cut -d'"' -f2)
+form_secret=$(egrep "form_secret:" homeserver.yml | cut -d'"' -f2)
 
 # store in yunohost settings
 ynh_app_setting_set $app registration_shared_secret "$registration_shared_secret"
