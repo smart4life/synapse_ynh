@@ -169,6 +169,10 @@ test -e /etc/matrix-$app/dh.pem && mv /etc/matrix-$app/dh.pem $domain.tls.dh
 
 # Generate config and keys
 python -m synapse.app.homeserver --keys-directory /etc/matrix-$app/ --generate-config --generate-keys --server-name $domain --report-stats=no -c homeserver.yml
+test -e /etc/matrix-$app/$domain.signing.key || cp ../conf/certs/signing.key /etc/matrix-$app/$domain.signing.key
+test -e /etc/matrix-$app/$domain.tls.crt || cp ../conf/certs/tls.crt /etc/matrix-$app/$domain.tls.crt
+test -e /etc/matrix-$app/$domain.tls.dh || cp ../conf/certs/tls.dh /etc/matrix-$app/$domain.tls.dh
+test -e /etc/matrix-$app/$domain.tls.key || cp ../conf/certs/tls.key /etc/matrix-$app/$domain.tls.key
 
 # This function was defined when we called "source $final_path/bin/activate". With this function we undo what "$final_path/bin/activate" does
 deactivate
