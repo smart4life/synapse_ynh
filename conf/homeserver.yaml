@@ -582,17 +582,17 @@ password_config:
 
 
 ## For password by LDAP
-password_providers:
- - module: "ldap_auth_provider.LdapAuthProvider"
-   config:
-     enabled: true
-     uri: "ldap://localhost"
-     start_tls: false
-     base: "ou=users,dc=yunohost,dc=org"
-     attributes:
-        uid: "uid"
-        mail: "mail"
-        name: "givenName"
+#password_providers:
+ #- module: "ldap_auth_provider.LdapAuthProvider"
+   #config:
+     #enabled: true
+     #uri: "ldap://localhost"
+     #start_tls: false
+     #base: "ou=users,dc=yunohost,dc=org"
+     #attributes:
+        #uid: "uid"
+        #mail: "mail"
+        #name: "givenName"
         #bind_dn:
         #bind_password:
         #filter: "(objectClass=posixAccount)"
