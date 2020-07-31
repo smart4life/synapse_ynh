@@ -60,16 +60,6 @@ ynh_psql_test_if_first_run() {
 		pg_hba=""
 		echo "$pgsql" >> /etc/yunohost/psql
 
-		if [ -e /etc/postgresql/9.4/ ]
-		then
-			pg_hba=/etc/postgresql/9.4/main/pg_hba.conf
-		elif [ -e /etc/postgresql/9.6/ ]
-		then
-			pg_hba=/etc/postgresql/9.6/main/pg_hba.conf
-		else
-			ynh_die "postgresql shoud be 9.4 or 9.6"
-		fi
-
 		systemctl start postgresql
                 su --command="psql -c\"ALTER user postgres WITH PASSWORD '${pgsql}'\"" postgres
 		# we can't use peer since YunoHost create users with nologin
