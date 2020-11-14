@@ -764,7 +764,8 @@ url_preview_ip_range_blacklist:
 
 # The public URIs of the TURN server to give to clients
 #
-turn_uris: [ "turn:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=udp", "turn:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=tcp" ]
+turn_uris: [ "stuns:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=dtls", "stuns:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=tls",
+             "turns:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=dtls", "turns:__DOMAIN__:__TURNSERVER_TLS_PORT__?transport=tls" ]
 
 # The shared secret used to compute passwords for the TURN server
 #
@@ -778,7 +779,7 @@ turn_shared_secret: "__TURNPWD__"
 
 # How long generated TURN credentials last
 #
-turn_user_lifetime: 1h
+turn_user_lifetime: 12h
 
 # Whether guests should be allowed to use the TURN server.
 # This defaults to True, otherwise VoIP will be unreliable for guests.
