@@ -216,9 +216,9 @@ ynh_exec_warn_less yunohost firewall allow Both $turnserver_alt_tls_port
 #=================================================
 ynh_script_progression --message="Configuring SSOwat..."
 
-# Open access to server without a button the home
-# The script "add_sso_conf.py" will just add en entry for the path "/_matrix" in the sso conf.json.persistent file in the cathegory "skipped_urls".
-python3 ../settings/conf/add_sso_conf.py $domain $server_name || ynh_die --message="Your file /etc/ssowat/conf.json.persistent doesn't respect the json syntax. Please fix the syntax to install this app. For more information see here: https://github.com/YunoHost-Apps/synapse_ynh/issues/32"
+ynh_permission_create --permission "_matrix" --url "/_matrix" --allowed "visitors" --label "Matrix API (leave it open to visitors!)"
+ynh_permission_create --permission "well-known" --url "/.well-known/matrix/" --allowed "visitors" --label "Matrix's well-known URI (helps federation)"
+ynh_permission_create --permission "login" --url "/_matrix/cas_server.php/login" --allowed "all_users" --label "Which users should be allowed to log into your Matrix server"
 
 #=================================================
 # SETUP LOGROTATE
